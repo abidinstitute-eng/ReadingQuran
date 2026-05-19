@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abid Rafiq Institute - Holy Quran Gallery</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #27ae60;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        header {
+            background: white;
+            padding: 30px 20px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            text-align: center;
+        }
+        h1 { color: var(--primary-color); margin: 0; font-size: 2em; }
+        .subtitle { color: #666; margin-top: 5px; font-size: 1.1em; }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        input {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            width: 180px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        button {
+            padding: 12px 25px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: background 0.3s, transform 0.1s;
+        }
+        button:hover { background: #219150; }
+        button:active { transform: scale(0.98); }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 25px;
+            padding: 40px 20px;
+            max-width: 1400px;
+            margin: auto;
+        }
+        .img-container {
+            background: var(--card-bg);
+            padding: 12px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        .img-container:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+        }
+        img {
+            width: 100%;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            border-radius: 8px;
+            display: block;
+            background: #eee;
+        }
+        .label {
+            margin-top: 12px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        /* Lightbox Styles */
+        #lightbox {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            backdrop-filter: blur(5px);
+        }
+        #lightbox img {
+            max-height: 85vh;
+            width: auto;
+            max-width: 90%;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            object-fit: contain;
+            aspect-ratio: auto;
+        }
+        #lightbox .close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 50px;
+            cursor: pointer;
+            user-select: none;
+        }
+        #lightbox .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: none;
+            padding: 20px;
+            font-size: 2em;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        #prevBtn { left: 20px; }
+        #nextBtn { right: 20px; }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary-color);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.5em; }
+            .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+            #lightbox .nav-btn { padding: 10px; font-size: 1.5em; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Abid Rafiq Institute</h1>
+    <div class="subtitle">Holy Quran - Standard 1 Collection</div>
+    <div class="controls">
+        <input type="number" id="pageInput" placeholder="Page (1-625)" min="1" max="625">
+        <button onclick="jumpToPage()">Jump to Page</button>
+    </div>
+</header>
+
+<div class="grid" id="gallery"></div>
+
+<div id="lightbox">
+    <span class="close" onclick="closeLightbox()">&times;</span>
+    <button class="nav-btn" id="prevBtn" onclick="changePage(-1); event.stopPropagation();">&#10094;</button>
+    <img id="lightboxImg">
+    <button class="nav-btn" id="nextBtn" onclick="changePage(1); event.stopPropagation();">&#10095;</button>
+    <div id="lightboxLabel" style="color: white; margin-top: 15px; font-size: 1.2em; font-weight: bold;"></div>
+</div>
+
+<div class="back-to-top" id="backToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+    &#8593;
+</div>
+
+<script>
+    const gallery = document.getElementById('gallery');
+    const totalImages = 625;
+    let currentLightboxIndex = 1;
+
+    // Generate Gallery
+    for (let i = 1; i <= totalImages; i++) {
+        const container = document.createElement('div');
+        container.className = 'img-container';
+        container.id = `page-${i}`;
+        container.onclick = () => openLightbox(i);
+
+        const img = document.createElement('img');
+        img.src = `standard1-quran-${i}.jpg`;
+        img.alt = `Quran Page ${i}`;
+        img.loading = "lazy";
+
+        const label = document.createElement('div');
+        label.className = 'label';
+        label.textContent = `Page ${i}`;
+
+        container.appendChild(img);
+        container.appendChild(label);
+        gallery.appendChild(container);
+    }
+
+    function openLightbox(index) {
+        currentLightboxIndex = index;
+        updateLightbox();
+        document.getElementById('lightbox').style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Prevent scrolling
+    }
+
+    function closeLightbox() {
+        document.getElementById('lightbox').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    function updateLightbox() {
+        document.getElementById('lightboxImg').src = `standard1-quran-${currentLightboxIndex}.jpg`;
+        document.getElementById('lightboxLabel').textContent = `Page ${currentLightboxIndex}`;
+    }
+
+    function changePage(delta) {
+        currentLightboxIndex += delta;
+        if (currentLightboxIndex < 1) currentLightboxIndex = totalImages;
+        if (currentLightboxIndex > totalImages) currentLightboxIndex = 1;
+        updateLightbox();
+    }
+
+    function jumpToPage() {
+        const val = parseInt(document.getElementById('pageInput').value);
+        if (val >= 1 && val <= totalImages) {
+            const el = document.getElementById(`page-${val}`);
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // Highlight effect
+            el.style.transition = "none";
+            el.style.outline = "5px solid var(--accent-color)";
+            el.style.backgroundColor = "#e8f5e9";
+
+            setTimeout(() => {
+                el.style.transition = "all 0.5s";
+                el.style.outline = "none";
+                el.style.backgroundColor = "white";
+            }, 2000);
+        } else {
+            alert("Please enter a page number between 1 and 625");
+        }
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (document.getElementById('lightbox').style.display === 'flex') {
+            if (e.key === 'ArrowLeft') changePage(-1);
+            if (e.key === 'ArrowRight') changePage(1);
+            if (e.key === 'Escape') closeLightbox();
+        }
+    });
+
+    // Back to top visibility
+    window.onscroll = function() {
+        const btn = document.getElementById('backToTop');
+        if (document.body.scrollTop > 500 || document.documentElement.scrollTop > 500) {
+            btn.style.display = "flex";
+        } else {
+            btn.style.display = "none";
+        }
+    };
+</script>
+</body>
+</html>
