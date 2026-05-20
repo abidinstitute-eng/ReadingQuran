@@ -172,7 +172,7 @@
     <h1>Abid Rafiq Institute</h1>
     <div class="subtitle">Holy Quran - Standard 1 Collection</div>
     <div class="controls">
-        <input type="number" id="pageInput" placeholder="Page (1-625)" min="1" max="625">
+        <input type="number" id="pageInput" placeholder="Page (3-625)" min="3" max="625">
         <button onclick="jumpToPage()">Jump to Page</button>
     </div>
 </header>
@@ -194,10 +194,10 @@
 <script>
     const gallery = document.getElementById('gallery');
     const totalImages = 625;
-    let currentLightboxIndex = 1;
+    let currentLightboxIndex = 3;
 
     // Generate Gallery
-    for (let i = 1; i <= totalImages; i++) {
+    for (let i = 3; i <= totalImages; i++) {
         const container = document.createElement('div');
         container.className = 'img-container';
         container.id = `page-${i}`;
@@ -236,14 +236,14 @@
 
     function changePage(delta) {
         currentLightboxIndex += delta;
-        if (currentLightboxIndex < 1) currentLightboxIndex = totalImages;
-        if (currentLightboxIndex > totalImages) currentLightboxIndex = 1;
+        if (currentLightboxIndex < 3) currentLightboxIndex = totalImages;
+        if (currentLightboxIndex > totalImages) currentLightboxIndex = 3;
         updateLightbox();
     }
 
     function jumpToPage() {
         const val = parseInt(document.getElementById('pageInput').value);
-        if (val >= 1 && val <= totalImages) {
+        if (val >= 3 && val <= totalImages) {
             const el = document.getElementById(`page-${val}`);
             el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
@@ -258,7 +258,7 @@
                 el.style.backgroundColor = "white";
             }, 2000);
         } else {
-            alert("Please enter a page number between 1 and 625");
+            alert("Please enter a page number between 3 and 625");
         }
     }
 
